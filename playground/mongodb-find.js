@@ -5,12 +5,12 @@ MongoClient.connect('mongodb://test:test@ds247027.mlab.com:47027/todo-api',(err,
         return console.log('unable to connect');
     }
     console.log('success fully connected');
-//     db.collection('user').find().toArray().then((docs)=>{
-//         console.log(JSON.stringify(docs,undefined,2));
-//     }).catch((err)=>{
-//         console.log(err.message);
-//     })
-// 
+        //     db.collection('user').find().toArray().then((docs)=>{
+        //         console.log(JSON.stringify(docs,undefined,2));
+        //     }).catch((err)=>{
+        //         console.log(err.message);
+        //     })
+        // 
 
 
         // db.collection('user').deleteMany({name:'vinod'}).then((result)=>{
