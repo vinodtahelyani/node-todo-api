@@ -51,7 +51,4 @@ MongoClient.connect('mongodb://test:test@ds247027.mlab.com:47027/todo-api',(err,
         }).then((doc)=>{
             console.log(doc);
         });
-
-
-
 });

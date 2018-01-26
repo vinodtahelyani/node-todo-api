@@ -48,11 +48,11 @@ console.log(mongoose.Types.ObjectID.isValid('53cb6b9b4f4ddef1ad47f943'));
 //     console.log('e',e);
 // });
 
-User.findById({
-    _id:id
-}).then((doc)=>{
-    if(doc === null)return console.log('cannot match the given Id');
-    console.log('doc',doc);
-}).catch((e)=>{
-    console.log('e',e);
-});
+// User.findById({
+//     _id:id
+// }).then((doc)=>{
+//     if(doc === null)return console.log('cannot match the given Id');
+//     console.log('doc',doc);
+// }).catch((e)=>{
+//     console.log('e',e);
+// });
