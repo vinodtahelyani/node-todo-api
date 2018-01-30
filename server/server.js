@@ -5,6 +5,7 @@ const {ObjectId} = require('mongoose').Types;
 const _ = require('lodash');
 var express = require('express');
 var bodyParser = require('body-parser');
+var authenticate =require('./../middlewares/authenticate');
 
 var app = express();
 app.use(bodyParser.json());
@@ -31,7 +32,6 @@ app.get('/todos',(req,res)=>{
         res.status(400).send(e);
     }); 
 });
-
 
 app.delete('/todos/:id',(req,res)=>{
     if(! ObjectId.isValid(req.params.id))return res.status(400).send('Invalid Id');
@@ -89,8 +89,6 @@ app.patch('/todos/:id',urlencodedParser,(req,res)=>{
 app.post('/user',urlencodedParser,(req,res)=>{
     var body = _.pick(req.body,['email','password']);
     var usr = new User(body);
-    //console.log(usr);
-
     usr.generateAuthToken().then((token)=>{
         console.log(usr);
         res.header('x-auth',token).send(usr);
@@ -98,6 +96,10 @@ app.post('/user',urlencodedParser,(req,res)=>{
         res.status(400).send(e.message);
     });
     
+});
+
+app.get('/user/me',authenticate,(req,res)=>{
+    res.send(req.user);
 });
 
 app.listen('3000',()=>{

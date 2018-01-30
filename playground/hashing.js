@@ -7,7 +7,7 @@ var data = {
 
 var token = jwt.sign(data,'abc3043');
 
-var decoded = jwt.verify(token,'abc3043');
+var decoded = jwt.verify("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1YTZmOTg1OTRhMjA1OTM1MDA0ODBhYTciLCJhY2Nlc3MiOiJhdXRoIiwiaWF0IjoxNTE3MjYyOTM3fQ.LKIfQHWdeni2sZmeY6Q6hDJkjIV0UTpG8vaZb9zA_6U",'some secret key');
 console.log(decoded);
 
 // var message = 'I m a easy user';

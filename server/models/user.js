@@ -42,6 +42,24 @@ UserSchema.methods.toJSON = function(){
     return _.pick(UserObject,['_id','email']);
 };
 
+UserSchema.statics.findByToken = function(token) {
+    var User = this;
+    var decoded ;
+    try{
+    decoded=jwt.verify(token,'some secret key');
+    }catch(e){
+         return Promise.reject(e.message);
+    }
+   return User.findOne({
+        '_id':decoded._id,
+        'tokens.token':token,
+        'tokens.access':'auth'
+    }).then((doc)=>{
+        return doc;
+    });
+   
+};
+
 UserSchema.methods.generateAuthToken = function() {
     var user = this;
     var access = 'auth';
