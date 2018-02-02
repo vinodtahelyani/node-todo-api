@@ -6,6 +6,8 @@ const _ = require('lodash');
 var express = require('express');
 var bodyParser = require('body-parser');
 var authenticate =require('./../middlewares/authenticate');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 var app = express();
 app.use(bodyParser.json());
@@ -20,7 +22,6 @@ app.post('/todos',urlencodedParser,(req,res)=>{
         res.status(400).send(e);
     });
 });
-
 
 app.get('/todos',(req,res)=>{
     Todo.find().then((doc)=>{
@@ -44,7 +45,7 @@ app.delete('/todos/:id',(req,res)=>{
 });
 
 app.get('/todos/:id',(req,res)=>{
-    if(! ObjectId.isValid(req.params.id)) return res.status(400).send('Invalid Id');
+    if(! ObjectId.isValid(req.params.id))return res.status(400).send('Invalid Id');
     Todo.findById(req.params.id).then((doc)=>{
         console.log(req.params.id);
         console.log(doc);
@@ -90,16 +91,33 @@ app.post('/user',urlencodedParser,(req,res)=>{
     var body = _.pick(req.body,['email','password']);
     var usr = new User(body);
     usr.generateAuthToken().then((token)=>{
-        console.log(usr);
         res.header('x-auth',token).send(usr);
     }).catch((e)=>{
         res.status(400).send(e.message);
+    });  
+});
+
+app.post('/user/signin',(req,res)=>{
+    var body = _.pick(req.body,['email','password']);
+    User.findByCredentials(body.email,body.password).then((user)=>{
+        user.generateAuthToken().then((token)=>{
+            res.header('x-auth',token).send(user);
+        });
+    }).catch((e)=>{
+        res.status(400).send(e);        
     });
-    
 });
 
 app.get('/user/me',authenticate,(req,res)=>{
-    res.send(req.user);
+        res.send(req.user);
+});
+
+app.delete('/user/me/token',authenticate,(req,res)=>{
+    req.user.removeToken(req.token).then(()=>{
+        res.status(200).send();
+    }).catch((e)=>{
+        res.status(400).send(e);                
+    });
 });
 
 app.listen('3000',()=>{
