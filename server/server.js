@@ -12,10 +12,13 @@ const jwt = require('jsonwebtoken');
 var app = express();
 app.use(bodyParser.json());
 
-var urlencodedParser = bodyParser.urlencoded({ extended: false });
+//todo request
 
-app.post('/todos',urlencodedParser,(req,res)=>{
-    var todo = new Todo(req.body);
+app.post('/todos',authenticate,(req,res)=>{
+    var todo = new Todo({
+        text:req.body.text,
+        _creator:req.user._id
+    });
     todo.save().then((doc)=>{
         res.send(doc);
     },(e)=>{
@@ -23,8 +26,8 @@ app.post('/todos',urlencodedParser,(req,res)=>{
     });
 });
 
-app.get('/todos',(req,res)=>{
-    Todo.find().then((doc)=>{
+app.get('/todos',authenticate,(req,res)=>{
+    Todo.find({_creator:req.user._id}).then((doc)=>{
         res.send({
             todos:doc,
             status:200
@@ -34,9 +37,9 @@ app.get('/todos',(req,res)=>{
     }); 
 });
 
-app.delete('/todos/:id',(req,res)=>{
+app.delete('/todos/:id',authenticate,(req,res)=>{
     if(! ObjectId.isValid(req.params.id))return res.status(400).send('Invalid Id');
-    Todo.findByIdAndRemove(req.params.id).then((doc)=>{
+    Todo.findOneAndRemove({_id:req.params.id,_creator:req.user._id}).then((doc)=>{
         if(doc === null)return res.status(400).send({message:'Item not present',status:400});
         res.status(200).send({message:'Item successfully deleted',doc});
     },(e)=>{
@@ -44,11 +47,9 @@ app.delete('/todos/:id',(req,res)=>{
     });
 });
 
-app.get('/todos/:id',(req,res)=>{
+app.get('/todos/:id',authenticate,(req,res)=>{
     if(! ObjectId.isValid(req.params.id))return res.status(400).send('Invalid Id');
-    Todo.findById(req.params.id).then((doc)=>{
-        console.log(req.params.id);
-        console.log(doc);
+    Todo.findOne({_id:req.params.id,_creator:req.user._id}).then((doc)=>{
         if(doc === null)return res.send('Cannot match the given Id');
         res.send(doc);
     }).catch((e)=>{
@@ -57,7 +58,7 @@ app.get('/todos/:id',(req,res)=>{
 });
 
 
-app.patch('/todos/:id',urlencodedParser,(req,res)=>{
+app.patch('/todos/:id', authenticate, (req,res)=>{
     var id = req.params.id;
     var body = _.pick(req.body,['text','completed']);
     if(! ObjectId.isValid(id))return res.status(400).send('Invalid Id');
@@ -68,13 +69,13 @@ app.patch('/todos/:id',urlencodedParser,(req,res)=>{
         body.completedAt = null;
         body.completed = false;
     }
-    Todo.findByIdAndUpdate({
-        _id :id
-    },{
+    Todo.findOneAndUpdate({_id:req.params.id,_creator:req.user._id}
+    ,{
         $set:body
     },{
         new :true
-    }).then((doc)=>{
+    }
+).then((doc)=>{
         res.status(200).send({
             status:200,
             doc
@@ -83,7 +84,6 @@ app.patch('/todos/:id',urlencodedParser,(req,res)=>{
         res.send(e.message);
     });
 });
-
 
 //user request
 

@@ -92,8 +92,7 @@ UserSchema.methods.removeToken = function(token){
             }
         }}).then(()=>{
         return Promise.resolve();
-    }).catch((e)=>{
-        console.log('***');        
+    }).catch((e)=>{       
         return Promise.reject();
     });
 };
