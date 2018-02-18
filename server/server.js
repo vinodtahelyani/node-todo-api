@@ -1,3 +1,4 @@
+require('./../config/config');
 var {mongoose} = require('./db/mongoose.js');
 var {Todo} = require('./models/todo');
 var {User}  = require('./models/user');
@@ -87,7 +88,7 @@ app.patch('/todos/:id', authenticate, (req,res)=>{
 
 //user request
 
-app.post('/user',urlencodedParser,(req,res)=>{
+app.post('/user',(req,res)=>{
     var body = _.pick(req.body,['email','password']);
     var usr = new User(body);
     usr.generateAuthToken().then((token)=>{
@@ -120,6 +121,6 @@ app.delete('/user/me/token',authenticate,(req,res)=>{
     });
 });
 
-app.listen('3000',()=>{
-    console.log('Listening on port 3000');
+app.listen(process.env.PORT,()=>{
+    console.log(`Listening on port ${process.env.PORT}`);
 });
